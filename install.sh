@@ -10,29 +10,36 @@ read STATICIPADDRESS
 echo "Username?"
 read MYUSER
 
-echo "Password?"
-read MYPASSWORD
+sudo adduser $MYUSER
+su - $MYUSER
 
+# do stuff that prompts user first so that the install is less painful
+if [ ! -d /home/$MYUSER/.ssh ]; then
+  sudo -u $MYUSER mkdir /home/$MYUSER/.ssh
+  ssh-keygen -t rsa
+fi
 
+# need to 
 sudo apt get update
 sudo apt get upgrade
 sudo apt get dist-upgrade
 
-# things to install: ssh, tmux, vim, git, my dotfile config, zsh, oh my zsh, docker, kubectl... anything else?...
-
 # install a bunch of easy packages
-sudo apt install -y tmux vim zsh git
+sudo apt install -y tmux vim zsh git ufw
 
-if [ ! -d directory ]; then
-  mkdir ~/git
-  git clone https://github.com/trevorvonseggern/dotfiles ~/git/dotfiles
-  git clone https://github.com/trevorvonseggern/vim ~/git/vim
+sudo ufw allow ssh
+sudo ufw enable
+
+if [ ! -d /home/$MYUSER/git ]; then
+  sudo -u $MYUSER mkdir /home/$MYUSER/git
+  sudo -u $MYUSER git clone https://github.com/trevorvonseggern/dotfiles ~/git/dotfiles
+  sudo -u $MYUSER git clone https://github.com/trevorvonseggern/vim ~/git/vim
   # todo: run the install script for each of these repos.
 fi
 
 
 # oh my zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sudo -u $MYUSER sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # ssh
 sudo systemctl enable ssh
@@ -40,7 +47,7 @@ sudo systemctl start ssh
 
 
 # docker
-curl -sSL get.docker.com | sh && \ sudo usermod pi -aG docker
+curl -sSL get.docker.com | sh && \ sudo usermod $MYUSER -aG docker
 # docker doesn't like swap file
 sudo dphys-swapfile swapoff && \ sudo dphys-swapfile uninstall && \ sudo update-rc.d dphys-swapfile remove
 
