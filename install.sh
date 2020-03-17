@@ -20,6 +20,15 @@ if [ ! -d /home/$MYUSER/.ssh ]; then
   ssh-keygen -t rsa
 fi
 
+# get the static ip
+sudo echo "
+
+interface eth0
+static ip_address=$STATICIPADDRESS/24
+static routers=192.168.0.1
+static domain_name_servers=192.168.0.1"  >> /etc/dhcpcd.conf
+
+
 # need to 
 sudo apt get update
 sudo apt get upgrade
