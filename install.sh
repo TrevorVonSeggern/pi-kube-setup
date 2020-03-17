@@ -11,6 +11,7 @@ echo "Username?"
 read MYUSER
 
 sudo adduser $MYUSER
+sudo usermod -aG sudo $MYUSER
 su - $MYUSER
 
 # do stuff that prompts user first so that the install is less painful
@@ -38,16 +39,13 @@ if [ ! -d /home/$MYUSER/git ]; then
 fi
 
 
-# oh my zsh
-sudo -u $MYUSER sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
 # ssh
 sudo systemctl enable ssh
 sudo systemctl start ssh
 
 
 # docker
-curl -sSL get.docker.com | sh && \ sudo usermod $MYUSER -aG docker
+sudo curl -sSL get.docker.com | sh && \ sudo usermod $MYUSER -aG docker
 # docker doesn't like swap file
 sudo dphys-swapfile swapoff && \ sudo dphys-swapfile uninstall && \ sudo update-rc.d dphys-swapfile remove
 
@@ -58,3 +56,9 @@ echo "cgroup_enable=cpuset cgroup_enable=memory" > /boot/cmdline
 
 # kubernetes
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \ echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \ sudo apt-get update -q && \ sudo apt-get install -qy kubeadm
+
+
+
+
+# oh my zsh
+sudo -u $MYUSER sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
